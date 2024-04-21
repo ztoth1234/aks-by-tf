@@ -12,7 +12,7 @@ env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  #ARM_USE_OIDC: "true"
+  ARM_USE_OIDC: "true"
   #TF_LOG: "DEBUG"
 
 jobs:
@@ -55,6 +55,9 @@ jobs:
         working-directory: ./remote_state_backend/nonprod
         id: tf-plan
         run: |
+          export ARM_CLIENT_ID=$ARM_CLIENT_ID
+          export ARM_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID
+          export ARM_TENANT_ID=$ARM_TENANT_ID
           export exitcode=0
           terraform plan -detailed-exitcode -no-color -out tfplan_nonprod || export exitcode=$?
 
