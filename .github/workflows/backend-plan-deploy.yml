@@ -12,8 +12,8 @@ env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_USE_OIDC: "true"
-  TF_LOG: "DEBUG"
+  #ARM_USE_OIDC: "true"
+  #TF_LOG: "DEBUG"
 
 jobs:
   terraform-plan-nonprod:
@@ -33,7 +33,7 @@ jobs:
       # Install the latest version of the Terraform CLI
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.1
+          terraform_version: 1.7.0
           terraform_wrapper: false
 
       # Initialize a new or existing Terraform working directory by creating initial files,
