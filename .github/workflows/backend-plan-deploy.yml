@@ -163,38 +163,38 @@ jobs:
       run: terraform apply -input=false -no-color -auto-approve tfplan_nonprod
       working-directory: ./remote_state_backend/nonprod
 
-  # terraform-apply-prod:
-  #   name: 'Terraform Apply Prod'
-  #   runs-on: ubuntu-latest
-  #   environment: prod
-  #   needs: [terraform-plan-prod]
-    
-  #   steps:
-  #   # Checkout the repository to the GitHub Actions runner
-  #   - name: Checkout
-  #     uses: actions/checkout@v4
+  terraform-apply-prod:
+    name: 'Terraform Apply Prod'
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [terraform-plan-prod]
 
-  #   # Install the latest version of Terraform CLI
-  #   - name: Setup Terraform
-  #     uses: hashicorp/setup-terraform@v3
-  #     with:
-  #       terraform_version: 1.8.1
-  #       terraform_wrapper: false
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
 
-  #   # Initialize a new or existing Terraform working directory by creating initial files,
-  #   # loading any remote state, downloading modules, etc.
-  #   - name: Terraform Init
-  #     run: terraform init
-  #     working-directory: ./remote_state_backend/prod
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.8.1
+        terraform_wrapper: false
 
-  #   # Download saved plan from artifacts
-  #   - name: Download Terraform Plan
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: tfplan_prod
-  #       path: remote_state_backend/prod/
+    # Initialize a new or existing Terraform working directory by creating initial files,
+    # loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./remote_state_backend/prod
 
-  #   # Terraform Apply
-  #   - name: Terraform Apply
-  #     run: terraform apply -input=false -no-color -auto-approve tfplan_prod
-  #     working-directory: ./remote_state_backend/prod
+    # Download saved plan from artifacts
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan_prod
+        path: remote_state_backend/prod/
+
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -input=false -no-color -auto-approve tfplan_prod
+      working-directory: ./remote_state_backend/prod
