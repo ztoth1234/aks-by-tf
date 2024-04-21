@@ -15,9 +15,9 @@ terraform {
 }
 
 provider "azurerm" {
-  use_oidc                   = true // OIDC will be used for authentication if set to true. If you want to use SPN secret set to false
-  skip_provider_registration = true
-  storage_use_azuread        = true
+  use_oidc = true
+  #skip_provider_registration = true
+  #storage_use_azuread        = true
   features {}
 }
 
