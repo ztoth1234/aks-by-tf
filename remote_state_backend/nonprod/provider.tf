@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.8.1"
 
   required_providers {
     azurerm = {
@@ -15,7 +15,7 @@ terraform {
 }
 
 provider "azurerm" {
-  use_oidc  = true
+  use_oidc = true
   #skip_provider_registration = true
   #storage_use_azuread        = true
   features {}
