@@ -8,44 +8,48 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_USE_OIDC: "true"
+
 jobs:
   terraform-plan-nonprod:
     name: 'Terraform Plan NonProd'
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
-      ARM_USE_OIDC: "true"
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
     outputs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
+      # Checkout the repository to the GitHub Actions runner
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-    # Install the latest version of the Terraform CLI
+      # Install the latest version of the Terraform CLI
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.1
           terraform_wrapper: false
 
-    # Initialize a new or existing Terraform working directory by creating initial files, 
-    # loading any remote state, downloading modules, etc.
+      # Initialize a new or existing Terraform working directory by creating initial files,
+      # loading any remote state, downloading modules, etc.
       - name: Terraform Init
         working-directory: ./remote_state_backend/nonprod
         run: terraform init
   
-    # Checks that all Terraform configuration files adhere to a canonical format
-    # Will fail the build if not
+      # Checks that all Terraform configuration files adhere to a canonical format
+      # Will fail the build if not
       - name: Terraform Format
         working-directory: ./remote_state_backend/nonprod
         run: terraform fmt -check
 
         
-    # Generates an execution plan for Terraform
-    # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
+      # Generates an execution plan for Terraform
+      # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
       - name: Terraform Plan
         working-directory: ./remote_state_backend/nonprod
         id: tf-plan
@@ -73,55 +77,50 @@ jobs:
     name: 'Terraform Plan Prod'
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
-      ARM_USE_OIDC: "true"
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
     outputs:
       tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
+      # Checkout the repository to the GitHub Actions runner
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-    # Install the latest version of the Terraform CLI
+      # Install the latest version of the Terraform CLI
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.3
+          terraform_version: 1.8.1
           terraform_wrapper: false
 
-    # Initialize a new or existing Terraform working directory by creating initial files, 
-    # loading any remote state, downloading modules, etc.
+      # Initialize a new or existing Terraform working directory by creating initial files,
+      # loading any remote state, downloading modules, etc.
       - name: Terraform Init
         working-directory: ./remote_state_backend/prod
         run: terraform init
-  
-    # Checks that all Terraform configuration files adhere to a canonical format
-    # Will fail the build if not
+
+      # Checks that all Terraform configuration files adhere to a canonical format
+      # Will fail the build if not
       - name: Terraform Format
         working-directory: ./remote_state_backend/prod
         run: terraform fmt -check
 
-        
-    # Generates an execution plan for Terraform
-    # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
+      # Generates an execution plan for Terraform
+      # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
       - name: Terraform Plan
         working-directory: ./remote_state_backend/prod
         id: tf-plan
         run: |
           export exitcode=0
           terraform plan -detailed-exitcode -no-color -out tfplan_prod || export exitcode=$?
-
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
-          
           if [ $exitcode -eq 1 ]; then
             echo Terraform Plan Failed!
             exit 1
           else 
             exit 0
           fi
-          
+
       # Save plan to artifacts  
       - name: Publish Terraform Plan
         uses: actions/upload-artifact@v4
@@ -129,70 +128,57 @@ jobs:
           name: tfplan_prod
           path: remote_state_backend/prod/tfplan_prod
 
-  # terraform-apply-nonprod:
-  #   name: 'Terraform Apply NonProd'
-  #   runs-on: ubuntu-latest
-  #   environment: nonprod
-  #   env:
-  #     ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  #     ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  #     ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
-  #     ARM_USE_OIDC: "true"
-  #     planOutput: ${{needs.terraform-plan-nonprod.outputs.tfplanExitCode}}
-  #   needs: [terraform-plan-nonprod]
+  terraform-apply-nonprod:
+    name: 'Terraform Apply NonProd'
+    runs-on: ubuntu-latest
+    environment: nonprod
+    needs: [terraform-plan-nonprod]
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
 
-  #   steps:
-  #   # Checkout the repository to the GitHub Actions runner
-  #   - name: Checkout
-  #     uses: actions/checkout@v3
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.7.3
+        terraform_wrapper: false
 
-  #   # Install the latest version of Terraform CLI
-  #   - name: Setup Terraform
-  #     uses: hashicorp/setup-terraform@v3
-  #     with:
-  #       terraform_version: 1.7.3
-  #       terraform_wrapper: false
+    # Initialize a new or existing Terraform working directory by creating initial files,
+    # loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./remote_state_backend/nonprod
 
-  #   # Initialize a new or existing Terraform working directory by creating initial files,
-  #   # loading any remote state, downloading modules, etc.
-  #   - name: Terraform Init
-  #     run: terraform init
-  #     working-directory: ./remote_state_backend/nonprod
+    # Download saved plan from artifacts
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan_nonprod
+        path: remote_state_backend/nonprod/
 
-  #   # Download saved plan from artifacts
-  #   - name: Download Terraform Plan
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       name: tfplan_nonprod
-  #       path: remote_state_backend/nonprod/
-
-  #   # Terraform Apply
-  #   - name: Terraform Apply
-  #     run: terraform apply -input=false -no-color -auto-approve tfplan_nonprod
-  #     working-directory: ./remote_state_backend/nonprod
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -input=false -no-color -auto-approve tfplan_nonprod
+      working-directory: ./remote_state_backend/nonprod
 
   # terraform-apply-prod:
   #   name: 'Terraform Apply Prod'
   #   runs-on: ubuntu-latest
   #   environment: prod
-  #   env:
-  #     ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  #     ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  #     ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
-  #     ARM_USE_OIDC: "true"
-  #     planOutput: ${{needs.terraform-plan-prod.outputs.tfplanExitCode}}
   #   needs: [terraform-plan-prod]
     
   #   steps:
   #   # Checkout the repository to the GitHub Actions runner
   #   - name: Checkout
-  #     uses: actions/checkout@v3
+  #     uses: actions/checkout@v4
 
   #   # Install the latest version of Terraform CLI
   #   - name: Setup Terraform
   #     uses: hashicorp/setup-terraform@v3
   #     with:
-  #       terraform_version: 1.7.3
+  #       terraform_version: 1.8.1
   #       terraform_wrapper: false
 
   #   # Initialize a new or existing Terraform working directory by creating initial files,
