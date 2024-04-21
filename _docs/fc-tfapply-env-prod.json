@@ -1,0 +1,9 @@
+{
+    "name": "fc-tfapply-env-prod",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:ztoth1234/aks-by-tf:environment:prod",
+    "description": "Federated Credential for Terraform Check and Validation GitHub Actions",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}

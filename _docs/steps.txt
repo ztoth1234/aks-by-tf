@@ -1,0 +1,120 @@
+1. Create a public git repo within the Github Organization
+---------------------------------------------------------
+ztoth1234/aks-by-tf
+
+2. Create 2 Azure Entra App registrations/ Azure Service Principals
+   (1 for tf validations, 1 for tf plan/apply)
+--------------------------------------------------------------
+
+az ad app create --display-name appTfCheck
+az ad app create --display-name appTfApply
+
+tfCheckAppId=$(az ad app list --display-name appTfCheck --query "[].appId" --output tsv)
+tfApplyAppId=$(az ad app list --display-name appTfApply --query "[].appId" --output tsv)
+
+az ad sp create --id $tfCheckAppId
+az ad sp create --id $tfApplyAppId
+
+subscriptionId="2e16ab68-3b72-4a40-b5d2-d6ef972d6f7b"
+tenantId="06227e75-88cb-424f-8b1e-62a07888a6ba"
+tfCheckAssigneeObjectId=$(az ad sp list --all --display-name appTfCheck --query "[].id" --output tsv)
+tfApplyAssigneeObjectId=$(az ad sp list --all --display-name appTfApply --query "[].id" --output tsv)
+
+az role assignment create \
+--role contributor \
+--subscription $subscriptionId \
+--assignee-object-id  $tfCheckAssigneeObjectId \
+--assignee-principal-type ServicePrincipal \
+--scope /subscriptions/$subscriptionId
+
+az role assignment create \
+--role contributor \
+--subscription $subscriptionId \
+--assignee-object-id  $tfApplyAssigneeObjectId \
+--assignee-principal-type ServicePrincipal \
+--scope /subscriptions/$subscriptionId
+
+3. Create GitHub Environments(for tf-deployment jobs)
+-----------------------------------------------------
+> ztoth1234/aks-by-tf/Settings/Environments/nonprod (limit the environment to the 'main' branch)
+> ztoth1234/aks-by-tf/Settings/Environments/prod (limit the environment to the 'main' branch)
+
+4. Setup Azure Federated Identity
+---------------------------------
+4.1 For the read-only identity create 2 federated credentials as follows:
+-------------------------------------------------------------------------
+>  Set Entity Type to 'Pull Request'
+>  Set Entity Type to 'Branch' and use the 'main' branch name.
+
+az ad app federated-credential create --id $tfCheckAppId --parameters fc-tfcheck-pull-request.json
+("fc-tfcheck-pull-request.json" contains the following content)
+{
+    "name": "fc-tfcheck-pull-request",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:ztoth1234/aks-by-tf:pull-request",
+    "description": "Federated Credential for Terraform Check and Validation GitHub Actions",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+
+az ad app federated-credential create --id $tfCheckAppId --parameters fc-tfcheck-branch-main.json
+("fc-tfcheck-branch-main.json" contains the following content)
+{
+    "name": "fc-tfcheck-branch-main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:ztoth1234/aks-by-tf:ref:refs/heads/main",
+    "description": "Federated Credential for Terraform Check and Validation GitHub Actions",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+
+4.2 For the read/write identity create 1 federated credential per Environment as follows:
+-----------------------------------------------------------------------------------------
+>  Set Entity Type to 'environment' and use the 'nonprod' environment name
+>  Set Entity Type to 'environment' and use the 'prod' environment name
+
+az ad app federated-credential create --id $tfApplyAppId --parameters fc-tfapply-env-nonprod.json
+("fc-tfapply-env-nonprod.json" contains the following content)
+{
+    "name": "fc-tfapply-env-nonprod",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:ztoth1234/aks-by-tf:environment:nonprod",
+    "description": "Federated Credential for Terraform Check and Validation GitHub Actions",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+
+az ad app federated-credential create --id $tfApplyAppId --parameters fc-tfapply-env-prod.json
+("fc-tfapply-env-prod.json" contains the following content)
+{
+    "name": "fc-tfapply-env-prod",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:ztoth1234/aks-by-tf:environment:prod",
+    "description": "Federated Credential for Terraform Check and Validation GitHub Actions",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+
+
+
+5. Add GitHub Secrets
+----------------------
+>  Create the following secrets on the repository using the read-only identity:
+-------------------------------------------------------------------------------
+On the GitHub Repo/Settings/Secrets
+-----------------------------------
+    AZURE_CLIENT_ID : The application (client) ID of the app registration in Azure ($tfCheckAppId)
+    AZURE_TENANT_ID : The tenant ID of Azure Active Directory where the app registration is defined.($tenantId)
+    AZURE_SUBSCRIPTION_ID : The subscription ID where the app registration is defined. ($subscriptionId)
+
+
+> Additionally create an additional secrets on the 'nonprod' and 'prod' environments using the read-write identity:
+-------------------------------------------------------------------------------------------------------------------
+On the GitHub Repo/Settings/Environments/Secrets
+------------------------------------------------
+    AZURE_CLIENT_ID : The application (client) ID of the app registration in Azure ($tfApplyAppId)
+
