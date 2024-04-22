@@ -1,0 +1,200 @@
+name: 'Terraform Plan/Apply'
+
+on:
+  workflow_dispatch
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_USE_OIDC: "true"
+  #TF_LOG: "DEBUG"
+
+jobs:
+  terraform-plan-nonprod:
+    name: 'Terraform Plan NonProd'
+    runs-on: ubuntu-latest
+    env:
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
+    outputs:
+      tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Install the latest version of the Terraform CLI
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.1
+          terraform_wrapper: false
+
+      # Initialize a new or existing Terraform working directory by creating initial files,
+      # loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        working-directory: ./nonprod
+        run: terraform init
+  
+      # Checks that all Terraform configuration files adhere to a canonical format
+      # Will fail the build if not
+      - name: Terraform Format
+        working-directory: ./nonprod
+        run: terraform fmt -check
+
+      # Generates an execution plan for Terraform
+      # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
+      - name: Terraform Plan
+        working-directory: ./nonprod
+        id: tf-plan
+        run: |
+          export exitcode=0
+          terraform plan -detailed-exitcode -no-color -out tfplan_nonprod || export exitcode=$?
+
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          
+          if [ $exitcode -eq 1 ]; then
+            echo Terraform Plan Failed!
+            exit 1
+          else 
+            exit 0
+          fi
+          
+      # Save plan to artifacts  
+      - name: Publish Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan_nonprod
+          path: nonprod/tfplan_nonprod
+
+  terraform-plan-prod:
+    name: 'Terraform Plan Prod'
+    runs-on: ubuntu-latest
+    env:
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
+    outputs:
+      tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Install the latest version of the Terraform CLI
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.1
+          terraform_wrapper: false
+
+      # Initialize a new or existing Terraform working directory by creating initial files,
+      # loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        working-directory: ./prod
+        run: terraform init
+
+      # Checks that all Terraform configuration files adhere to a canonical format
+      # Will fail the build if not
+      - name: Terraform Format
+        working-directory: ./prod
+        run: terraform fmt -check
+
+      # Generates an execution plan for Terraform
+      # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
+      - name: Terraform Plan
+        working-directory: ./prod
+        id: tf-plan
+        run: |
+          export exitcode=0
+          terraform plan -detailed-exitcode -no-color -out tfplan_prod || export exitcode=$?
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          if [ $exitcode -eq 1 ]; then
+            echo Terraform Plan Failed!
+            exit 1
+          else 
+            exit 0
+          fi
+
+      # Save plan to artifacts  
+      - name: Publish Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan_prod
+          path: prod/tfplan_prod
+
+  terraform-apply-nonprod:
+    name: 'Terraform Apply NonProd'
+    runs-on: ubuntu-latest
+    environment: nonprod
+    needs: [terraform-plan-nonprod]
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.8.1
+        terraform_wrapper: false
+
+    # Initialize a new or existing Terraform working directory by creating initial files,
+    # loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./nonprod
+
+    # Download saved plan from artifacts
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan_nonprod
+        path: nonprod/
+
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -input=false -no-color -auto-approve tfplan_nonprod
+      working-directory: ./nonprod
+
+  terraform-apply-prod:
+    name: 'Terraform Apply Prod'
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [terraform-plan-prod]
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.8.1
+        terraform_wrapper: false
+
+    # Initialize a new or existing Terraform working directory by creating initial files,
+    # loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./prod
+
+    # Download saved plan from artifacts
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan_prod
+        path: prod/
+
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -input=false -no-color -auto-approve tfplan_prod
+      working-directory: ./prod
