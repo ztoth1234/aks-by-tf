@@ -118,3 +118,20 @@ On the GitHub Repo/Settings/Environments/Secrets
 ------------------------------------------------
     AZURE_CLIENT_ID : The application (client) ID of the app registration in Azure ($tfApplyAppId)
 
+6. Create Azure Storage and Container for Terraform backend
+-----------------------------------------------------------
+Create a Storage Account with Container/Environment, 1 for 'nonprod', 1 for 'prod'
+
+  6.1 Create GitHub Workflow for Terraform backend on Azure
+  ---------------------------------------------------------
+  .github/workflows/backend-plan-deploy.yml
+
+  6.2 Create Terraform code for backend Azure Storage (local backend)
+  -------------------------------------------------------------------
+  ./remote_state_backend/nonprod/*.tf
+  ./remote_state_backend/prod/*.tf
+
+  6.3 Run (only once) the Workflow to create the Azure Storage
+  ------------------------------------------------------------
+  Run the '.github/workflows/backend-plan-deploy.yml'
+
