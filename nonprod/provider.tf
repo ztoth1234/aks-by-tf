@@ -13,9 +13,9 @@ terraform {
     }
   }
   backend "azurerm" {
-    resource_group_name  = var.backend_resource_group_name
-    storage_account_name = var.backend_storage_account_name
-    container_name       = var.backend_storage_container_name
+    resource_group_name  = "rg-tfstate-nonprod-weu-01"
+    storage_account_name = "tfstatenonprodre0zt"
+    container_name       = "tfstate-nonprod"
     key                  = "nonprod.terraform.tfstate"
     use_oidc             = true
   }
