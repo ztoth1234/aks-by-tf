@@ -14,3 +14,30 @@ variable "tags" {
     "GitHubRepoReference" = "https://github.com/ztoth1234/aks-by-tf"
   }
 }
+
+variable "resource_groups" {
+  description = "Resource groups for nonprod."
+  type        = map(object({}))
+  default = {
+    rg1 = {
+      name     = "rg-aks-network-nonprod-weu-01"
+      location = "westeurope"
+    }
+    rg2 = {
+      name     = "rg-aks-monitor-nonprod-weu-01"
+      location = "westeurope"
+    }
+    rg3 = {
+      name     = "rg-aks-paas-nonprod-weu-01"
+      location = "westeurope"
+    }
+    rg4 = {
+      name     = "rg-aks-cluster-nonprod-weu-01"
+      location = "westeurope"
+    }
+    rg5 = {
+      name     = "rg-aks-remote-nonprod-weu-01"
+      location = "westeurope"
+    }
+  }
+}
