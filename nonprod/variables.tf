@@ -17,7 +17,10 @@ variable "tags" {
 
 variable "resource_groups" {
   description = "Resource groups for nonprod."
-  type        = map(object({}))
+  type = map(object({
+    name     = string
+    location = string
+  }))
   default = {
     rg1 = {
       name     = "rg-aks-network-nonprod-weu-01"
@@ -36,7 +39,7 @@ variable "resource_groups" {
       location = "westeurope"
     }
     rg5 = {
-      name     = "rg-aks-remote-nonprod-weu-01"
+      name     = "rg-aks-remote-nonprod-weu-01",
       location = "westeurope"
     }
   }
