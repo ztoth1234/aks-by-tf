@@ -24,19 +24,22 @@ resource "azurerm_network_security_group" "nsgs" {
   }
 }
 
-#resource "azurerm_route_table" "rts" {
-#  for_each            = var.rt_routes
-#  name                = each.key
-#  location            = azurerm_resource_group.example.location
-#  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_route_table" "rts" {
+  for_each            = var.rt_routes
+  name                = each.key
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 
-#  route {
-#    name                   = "example"
-#    address_prefix         = "10.100.0.0/14"
-#    next_hop_type          = "VirtualAppliance"
-#    next_hop_in_ip_address = "10.10.1.1"
-#  }
-#}
+  dynamic route {
+    for_each = flatten(each.value.routes)
+    content {
+      name                   = route.value.name
+      address_prefix         = route.value.address_prefix
+      next_hop_type          = route.value.next_hop_type
+      next_hop_in_ip_address = route.value.next_hop_in_ip_address
+    }
+  }
+}
 
 #resource "azurerm_virtual_network" "vnets" {
 #  for_each            = var.vnets
