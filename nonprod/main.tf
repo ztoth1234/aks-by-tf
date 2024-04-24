@@ -17,4 +17,7 @@ module "network" {
   #public_ip_list     = var.public_ips
   #vnet_peering_list  = var.vnet_peerings
   tags = var.tags
+  depends_on = [
+    azurerm_resource_group.resource_groups
+  ]
 }
