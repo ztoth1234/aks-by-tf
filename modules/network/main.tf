@@ -27,8 +27,8 @@ resource "azurerm_network_security_group" "nsgs" {
 resource "azurerm_route_table" "rts" {
   for_each            = var.rt_routes
   name                = each.key
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = var.location_network
+  resource_group_name = var.resourcegroup_name
 
   dynamic route {
     for_each = flatten(each.value.routes)
