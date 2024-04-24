@@ -20,15 +20,19 @@ variable "nsg_security_rules" {
   description = "NSGs with Security Rules"
   type = map(object({
     security_rules = list(object({
-      name                       = string
-      priority                   = number
-      direction                  = string
-      access                     = string
-      protocol                   = string
-      source_port_range          = string
-      destination_port_range     = string
-      source_address_prefix      = string
-      destination_address_prefix = string
+      name                         = string
+      priority                     = number
+      direction                    = string
+      access                       = string
+      protocol                     = string
+      source_port_range            = string
+      source_port_ranges           = list(any)
+      destination_port_range       = string
+      destination_port_ranges      = list(any)
+      source_address_prefix        = string
+      source_address_prefixes      = list(any)
+      destination_address_prefix   = string
+      destination_address_prefixes = list(any)
     }))
   }))
 }
@@ -45,15 +49,15 @@ variable "rt_routes" {
   }))
 }
 
-variable "public_ip_list" {
-  description = "The names of the public IP resources."
-  type        = list(string)
-}
+#variable "public_ip_list" {
+#  description = "The names of the public IP resources."
+#  type        = list(string)
+#}
 
-variable "vnet_peering_list" {
-  description = "The names of the VNET peering resources."
-  type        = list(string)
-}
+#variable "vnet_peering_list" {
+#  description = "The names of the VNET peering resources."
+#  type        = list(string)
+#}
 
 variable "tags" {
   description = "Tags to apply to all resources."
