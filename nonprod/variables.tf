@@ -72,7 +72,7 @@ variable "nsg_security_rules" {
           priority                     = 100
           direction                    = "Inbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = "443"
@@ -87,7 +87,7 @@ variable "nsg_security_rules" {
           priority                     = 110
           direction                    = "Inbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = "443"
@@ -102,7 +102,7 @@ variable "nsg_security_rules" {
           priority                     = 120
           direction                    = "Inbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = "443"
@@ -132,7 +132,7 @@ variable "nsg_security_rules" {
           priority                     = 100
           direction                    = "Outbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = ""
@@ -147,7 +147,7 @@ variable "nsg_security_rules" {
           priority                     = 110
           direction                    = "Outbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = "443"
@@ -241,7 +241,7 @@ variable "nsg_security_rules" {
           priority                     = 120
           direction                    = "Inbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = "443"
@@ -275,7 +275,7 @@ variable "nsg_security_rules" {
           priority                     = 100
           direction                    = "Inbound"
           access                       = "Allow"
-          protocol                     = "TCP"
+          protocol                     = "Tcp"
           source_port_range            = "*"
           source_port_ranges           = []
           destination_port_range       = ""
@@ -387,79 +387,79 @@ variable "vnets" {
     vnet-hub-nonprod-weu-01 = {
       address_space = ["192.168.1.0/24"]
       subnets = [
-      {
-        name     = "AzureFirewallSubnet"
-        address_prefix = "192.168.1.0/26"
-        nsg_name = ""
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      },
-      {
-        name     = "AzureBastionSubnet"
-        address_prefix = "192.168.1.192/26"
-        nsg_name = "nsg-bastion-nonprod-weu-01"
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      }
+        {
+          name           = "AzureFirewallSubnet"
+          address_prefix = "192.168.1.0/26"
+          nsg_name       = ""
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "AzureBastionSubnet"
+          address_prefix = "192.168.1.192/26"
+          nsg_name       = "nsg-bastion-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        }
       ]
     }
     vnet-spoke-nonprod-weu-01 = {
       address_space = ["10.1.0.0/21"]
       subnets = [
-      {
-        name     = "AwgSubnet"
-        address_prefix = "10.1.4.32/27"
-        nsg_name = "nsg-agw-nonprod-weu-01"
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      },
-      {
-        name     = "AksSubnet"
-        address_prefix = "10.1.1.0/23"
-        nsg_name = ""
-        rt_name  = "rt-aks-nonprod-weu-01"
-      },
-      {
-        name     = "JumpboxSubnet"
-        address_prefix = "10.1.4.64/27"
-        nsg_name = "nsg-jumpbox-nonprod-weu-01"
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      },
-      {
-        name     = "LbSubnet"
-        address_prefix = "10.1.4.0/27"
-        nsg_name = ""
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      },
-      {
-        name     = "PeSubnet"
-        address_prefix = "10.1.4.128/27"
-        nsg_name = "nsg-pe-nonprod-weu-01"
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      },
-      {
-        name     = "PrivateBuildAgentSubnet"
-        address_prefix = "10.1.4.96/27"
-        nsg_name = "nsg-pivateagent-nonprod-weu-01"
-        rt_name  = "rt-internet-default-nonprod-weu-01"
-      }
+        {
+          name           = "AwgSubnet"
+          address_prefix = "10.1.4.32/27"
+          nsg_name       = "nsg-agw-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "AksSubnet"
+          address_prefix = "10.1.1.0/23"
+          nsg_name       = ""
+          rt_name        = "rt-aks-nonprod-weu-01"
+        },
+        {
+          name           = "JumpboxSubnet"
+          address_prefix = "10.1.4.64/27"
+          nsg_name       = "nsg-jumpbox-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "LbSubnet"
+          address_prefix = "10.1.4.0/27"
+          nsg_name       = ""
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "PeSubnet"
+          address_prefix = "10.1.4.128/27"
+          nsg_name       = "nsg-pe-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "PrivateBuildAgentSubnet"
+          address_prefix = "10.1.4.96/27"
+          nsg_name       = "nsg-pivateagent-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        }
       ]
     }
   }
 }
 
-variable "public_ips" {
-  description = "The name of the Public IP address resources."
-  type        = list(string)
-  default     = [
-    pip-fw-nonprod-weu-01,
-    pip-agw-nonprod-weu-01,
-    pip-bastion-nonprod-weu-01
-  ]
-}
+#variable "public_ips" {
+#  description = "The name of the Public IP address resources."
+#  type        = list(string)
+#  default     = [
+#    pip-fw-nonprod-weu-01,
+#    pip-agw-nonprod-weu-01,
+#    pip-bastion-nonprod-weu-01
+#  ]
+#}
 
-variable "vnet_peerings" {
-  description = "The name of the VNET peering resources."
-  type        = list(string)
-  default     = [
-    peer-hub-spoke-nonprod-weu-01,
-    peer-spoke-hub-nonprod-weu-01
-  ]
-}
+#variable "vnet_peerings" {
+#  description = "The name of the VNET peering resources."
+#  type        = list(string)
+#  default     = [
+#    peer-hub-spoke-nonprod-weu-01,
+#    peer-spoke-hub-nonprod-weu-01
+#  ]
+#}

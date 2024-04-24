@@ -8,13 +8,13 @@ resource "azurerm_resource_group" "resource_groups" {
 # Create NSGs, RTs, VNETs with subnets, public IPs, VNETpeers #
 ###############################################################
 module "network" {
-  source             = "./modules/network"
+  source             = "../modules/network"
   location_network   = var.resource_groups["rg1"].location
   resourcegroup_name = var.resource_groups["rg1"].name
   vnets              = var.vnets
   nsg_security_rules = var.nsg_security_rules
   rt_routes          = var.rt_routes
-  public_ip_list     = var.public_ips
-  vnet_peering_list  = var.vnet_peerings
-  tags               = var.tags
+  #public_ip_list     = var.public_ips
+  #vnet_peering_list  = var.vnet_peerings
+  tags = var.tags
 }
