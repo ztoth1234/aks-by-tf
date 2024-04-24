@@ -16,14 +16,33 @@ variable "vnets" {
   }))
 }
 
-variable "nsg_list" {
-  description = "The names of the NSG resources."
-  type        = list(string)
+variable "nsg_security_rules" {
+  description = "NSGs with Security Rules"
+  type = map(object({
+    security_rules = list(object({
+      name                       = string
+      priority                   = number
+      direction                  = string
+      access                     = string
+      protocol                   = string
+      source_port_range          = string
+      destination_port_range     = string
+      source_address_prefix      = string
+      destination_address_prefix = string
+    }))
+  }))
 }
 
-variable "rt_list" {
-  description = "The names of the RT resources."
-  type        = list(string)
+variable "rt_routes" {
+  description = "RTs with Routes"
+  type = map(object({
+    routes = list(object({
+      name                   = string
+      address_prefix         = string
+      next_hop_type          = string
+      next_hop_in_ip_address = string
+    }))
+  }))
 }
 
 variable "public_ip_list" {
