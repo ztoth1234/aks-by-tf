@@ -43,7 +43,7 @@ resource "azurerm_route_table" "rts" {
 
 resource "azurerm_virtual_network" "vnets" {
   for_each            = var.vnets
-  name                = each.key
+  name                = each.value.vnet_name
   location            = var.location_network
   resource_group_name = var.resourcegroup_name
   address_space       = each.value.address_space
@@ -63,19 +63,14 @@ resource "azurerm_virtual_network" "vnets" {
   ]
 }
 
-#resource "azurerm_subnet_network_security_group_association" "nsg_to_subnet" {
-#  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v if v.nsg_name != ""}
-#  subnet_id                 = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
-#  network_security_group_id = azurerm_network_security_group.nsgs[each.value.nsg_name].id
-#}
-
-resource "azurerm_subnet_route_table_association" "rt_to_subnet" {
-  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v if v.rt_name != ""}
-  subnet_id      = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
+resource "azurerm_subnet_route_table_association" "rt_to_hub_subnets" {
+  for_each = {for k, v in flatten(var.vnets[[for v in var.vnets : v.vnet_name][0]].subnets) : k => v if v.rt_name != ""}
+  subnet_id      = azurerm_virtual_network.vnets[[for v in var.vnets : v.vnet_name][0]].subnet.*.id[each.key]
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
 }
 
-#resource "azurerm_subnet_route_table_association" "rt_to_subnet" {
-#  subnet_id      = azurerm_subnet.example.id
-#  route_table_id = azurerm_route_table.example.id
-#}
+resource "azurerm_subnet_route_table_association" "rt_to_spoke_subnets" {
+  for_each = {for k, v in flatten(var.vnets[[for v in var.vnets : v.vnet_name][1]].subnets) : k => v if v.rt_name != ""}
+  subnet_id      = azurerm_virtual_network.vnets[[for v in var.vnets : v.vnet_name][1]].subnet.*.id[each.key]
+  route_table_id = azurerm_route_table.rts[each.value.rt_name].id
+}

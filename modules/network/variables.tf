@@ -11,6 +11,7 @@ variable "resourcegroup_name" {
 variable "vnets" {
   description = "VNETs"
   type = map(object({
+    vnet_name     = string
     address_space = list(string)
     subnets       = list(map(string))
   }))

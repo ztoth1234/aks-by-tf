@@ -380,11 +380,13 @@ variable "rt_routes" {
 variable "vnets" {
   description = "VNETs"
   type = map(object({
+    vnet_name     = string
     address_space = list(string)
     subnets       = list(map(string))
   }))
   default = {
     vnet-hub-nonprod-weu-01 = {
+      vnet_name     = "vnet-hub-nonprod-weu-01"
       address_space = ["192.168.1.0/24"]
       subnets = [
         {
@@ -402,6 +404,7 @@ variable "vnets" {
       ]
     }
     vnet-spoke-nonprod-weu-01 = {
+      vnet_name     = "vnet-spoke-nonprod-weu-01"
       address_space = ["10.1.0.0/21"]
       subnets = [
         {
