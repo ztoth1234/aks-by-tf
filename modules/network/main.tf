@@ -41,36 +41,34 @@ resource "azurerm_route_table" "rts" {
   }
 }
 
-#resource "azurerm_virtual_network" "vnets" {
-#  for_each            = var.vnets
-#  name                = each.key
-#  location            = var.location_network
-#  resource_group_name = var.resourcegroup_name
-#  address_space       = each.value.address_space
+resource "azurerm_virtual_network" "vnets" {
+  for_each            = var.vnets
+  name                = each.key
+  location            = var.location_network
+  resource_group_name = var.resourcegroup_name
+  address_space       = each.value.address_space
 
-#  subnet {
-#    name           = "subnet1"
-#    address_prefix = "10.0.1.0/24"
-#  }
+  dynamic subnet {
+    for_each = flatten(each.value.subnets)
+    content {
+      name           = subnet.value.name
+      address_prefix = subnet.value.address_prefix
+    }
+  }
+  tags = var.tags
+  depends_on = [
+    azurerm_network_security_group.nsgs,
+    azurerm_route_table.rts
+  ]
+}
 
-#  subnet {
-#    name           = "subnet2"
-#    address_prefix = "10.0.2.0/24"
-#  }
+resource "azurerm_subnet_network_security_group_association" "nsg_to_subnet" {
+  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v }
+  subnet_id                 = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
+  network_security_group_id = azurerm_network_security_group.nsgs[each.value.nsg_name].id
+}
 
-#  tags = var.tags
-#  depends_on = [
-#    azurerm_network_security_group.nsgs,
-#    azazurerm_route_table.rts
-#  ]
-#}
-
-#resource "azurerm_subnet_network_security_group_association" "example" {
-#  subnet_id                 = azurerm_subnet.example.id
-#  network_security_group_id = azurerm_network_security_group.example.id
-#}
-
-#resource "azurerm_subnet_route_table_association" "example" {
+#resource "azurerm_subnet_route_table_association" "rt_to_subnet" {
 #  subnet_id      = azurerm_subnet.example.id
 #  route_table_id = azurerm_route_table.example.id
 #}
