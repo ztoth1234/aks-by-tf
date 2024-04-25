@@ -452,17 +452,17 @@ variable "public_ips" {
   description = "The name of the Public IP address resources."
   type        = list(string)
   default     = [
-    pip-fw-nonprod-weu-01,
-    pip-agw-nonprod-weu-01,
-    pip-bastion-nonprod-weu-01
+    "pip-fw-nonprod-weu-01",
+    "pip-agw-nonprod-weu-01",
+    "pip-bastion-nonprod-weu-01"
   ]
 }
 
-variable "vnet_peerings" {
+    variable "vnet_peerings" {
   description = "The name of the VNET peering resources."
   type        = list(string)
   default     = [
-    peer-hub-spoke-nonprod-weu-01,
-    peer-spoke-hub-nonprod-weu-01
+    "peer-hub-spoke-nonprod-weu-01",
+    "peer-spoke-hub-nonprod-weu-01"
   ]
 }

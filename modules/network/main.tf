@@ -85,7 +85,7 @@ resource "azurerm_subnet_route_table_association" "rt_to_spoke_subnets" {
 }
 
 resource "azurerm_public_ip" "public_ips" {
-  for_each            = var.public_ip_list
+  for_each            = toset(var.public_ip_list)
   name                = each.key
   resource_group_name = var.resourcegroup_name
   location            = var.location_network
