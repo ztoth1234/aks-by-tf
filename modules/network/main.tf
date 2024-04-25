@@ -92,3 +92,19 @@ resource "azurerm_public_ip" "public_ips" {
   allocation_method   = "Static"
   tags                = var.tags
 }
+
+resource "azurerm_virtual_network_peering" "hub_spoke" {
+  name                      = var.vnet_peering_list[0]
+  resource_group_name       = var.resourcegroup_name
+  virtual_network_name      = [for vn in var.vnets : vn.vnet_name][0]
+  remote_virtual_network_id = azurerm_virtual_network.vnets[[for vn in var.vnets : vn.vnet_name][1]].id
+  depends_on                = [azurerm_virtual_network.vnets]
+}
+
+resource "azurerm_virtual_network_peering" "spoke_hub" {
+  name                      = var.vnet_peering_list[1]
+  resource_group_name       = var.resourcegroup_name
+  virtual_network_name      = [for vn in var.vnets : vn.vnet_name][1]
+  remote_virtual_network_id = azurerm_virtual_network.vnets[[for vn in var.vnets : vn.vnet_name][0]].id
+  depends_on                = [azurerm_virtual_network.vnets]
+}
