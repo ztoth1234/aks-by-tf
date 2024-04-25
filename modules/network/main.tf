@@ -64,13 +64,13 @@ resource "azurerm_virtual_network" "vnets" {
 }
 
 resource "azurerm_subnet_route_table_association" "rt_to_hub_subnets" {
-  for_each = {for k, v in flatten(var.vnets[[for v in var.vnets : v.vnet_name][0]].subnets) : k => v if v.rt_name != ""}
-  subnet_id      = azurerm_virtual_network.vnets[[for v in var.vnets : v.vnet_name][0]].subnet.*.id[each.key]
+  for_each = {for k, v in flatten(var.vnets[[for vn in var.vnets : vn.vnet_name][0]].subnets) : k => v if v.rt_name != ""}
+  subnet_id      = azurerm_virtual_network.vnets[[for vn in var.vnets : vn.vnet_name][0]].subnet.*.id[each.key]
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
 }
 
 resource "azurerm_subnet_route_table_association" "rt_to_spoke_subnets" {
-  for_each = {for k, v in flatten(var.vnets[[for v in var.vnets : v.vnet_name][1]].subnets) : k => v if v.rt_name != ""}
-  subnet_id      = azurerm_virtual_network.vnets[[for v in var.vnets : v.vnet_name][1]].subnet.*.id[each.key]
+  for_each = {for k, v in flatten(var.vnets[[for vn in var.vnets : vn.vnet_name][1]].subnets) : k => v if v.rt_name != ""}
+  subnet_id      = azurerm_virtual_network.vnets[[for vn in var.vnets : vn.vnet_name][1]].subnet.*.id[each.key]
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
 }
