@@ -53,6 +53,7 @@ resource "azurerm_virtual_network" "vnets" {
     content {
       name           = subnet.value.name
       address_prefix = subnet.value.address_prefix
+      security_group = subnet.value.nsg_name != "" ? subnet.value.nsg_name : null
     }
   }
   tags = var.tags
@@ -62,11 +63,11 @@ resource "azurerm_virtual_network" "vnets" {
   ]
 }
 
-resource "azurerm_subnet_network_security_group_association" "nsg_to_subnet" {
-  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v if v.nsg_name != ""}
-  subnet_id                 = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
-  network_security_group_id = azurerm_network_security_group.nsgs[each.value.nsg_name].id
-}
+#resource "azurerm_subnet_network_security_group_association" "nsg_to_subnet" {
+#  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v if v.nsg_name != ""}
+#  subnet_id                 = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
+#  network_security_group_id = azurerm_network_security_group.nsgs[each.value.nsg_name].id
+#}
 
 #resource "azurerm_subnet_route_table_association" "rt_to_subnet" {
 #  subnet_id      = azurerm_subnet.example.id

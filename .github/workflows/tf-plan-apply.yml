@@ -160,7 +160,7 @@ jobs:
 
     # Terraform Apply
     - name: Terraform Apply
-      run: terraform apply -input=false -no-color -auto-approve tfplan_nonprod
+      run: terraform apply -input=false -auto-approve tfplan_nonprod
       working-directory: ./nonprod
 
   #terraform-apply-prod:
