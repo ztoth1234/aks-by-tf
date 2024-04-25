@@ -63,7 +63,7 @@ resource "azurerm_virtual_network" "vnets" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "nsg_to_subnet" {
-  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v }
+  for_each = {for k, v in flatten(var.vnets["vnet-hub-nonprod-weu-01"].subnets) : k => v if v.nsg_name != ""}
   subnet_id                 = azurerm_virtual_network.vnets["vnet-hub-nonprod-weu-01"].subnet.*.id[each.key]
   network_security_group_id = azurerm_network_security_group.nsgs[each.value.nsg_name].id
 }

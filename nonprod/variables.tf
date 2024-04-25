@@ -390,7 +390,7 @@ variable "vnets" {
         {
           name           = "AzureFirewallSubnet"
           address_prefix = "192.168.1.0/26"
-          nsg_name       = "nsg-bastion-nonprod-weu-01"
+          nsg_name       = ""
           rt_name        = "rt-internet-default-nonprod-weu-01"
         },
         {
@@ -412,7 +412,7 @@ variable "vnets" {
         },
         {
           name           = "AksSubnet"
-          address_prefix = "10.1.1.0/23"
+          address_prefix = "10.1.0.0/23"
           nsg_name       = ""
           rt_name        = "rt-aks-nonprod-weu-01"
         },
