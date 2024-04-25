@@ -1,3 +1,4 @@
+data "azurerm_subscription" "current" {}
 resource "azurerm_network_security_group" "nsgs" {
   for_each            = var.nsg_security_rules
   name                = each.key
@@ -43,7 +44,7 @@ resource "azurerm_route_table" "rts" {
 
 resource "azurerm_virtual_network" "vnets" {
   for_each            = var.vnets
-  name                = each.value.vnet_name
+  name                = each.key
   location            = var.location_network
   resource_group_name = var.resourcegroup_name
   address_space       = each.value.address_space
@@ -71,6 +72,6 @@ resource "azurerm_subnet_route_table_association" "rt_to_hub_subnets" {
 
 resource "azurerm_subnet_route_table_association" "rt_to_spoke_subnets" {
   for_each = {for k, v in flatten(var.vnets[[for vn in var.vnets : vn.vnet_name][1]].subnets) : k => v if v.rt_name != ""}
-  subnet_id      = azurerm_virtual_network.vnets[[for vn in var.vnets : vn.vnet_name][1]].subnet.*.id[each.key]
+  subnet_id      = "${data.azurerm_subscription.current.id}/resourceGroups/${var.resourcegroup_name}/providers/Microsoft.Network/virtualNetworks/${[for vn in var.vnets : vn.vnet_name][1]}/subnets/${each.value.name}"
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
 }
