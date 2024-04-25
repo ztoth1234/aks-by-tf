@@ -14,8 +14,8 @@ module "network" {
   vnets              = var.vnets
   nsg_security_rules = var.nsg_security_rules
   rt_routes          = var.rt_routes
-  #public_ip_list     = var.public_ips
-  #vnet_peering_list  = var.vnet_peerings
+  public_ip_list     = var.public_ips
+  vnet_peering_list  = var.vnet_peerings
   tags = var.tags
   depends_on = [
     azurerm_resource_group.resource_groups

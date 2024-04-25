@@ -50,15 +50,15 @@ variable "rt_routes" {
   }))
 }
 
-#variable "public_ip_list" {
-#  description = "The names of the public IP resources."
-#  type        = list(string)
-#}
+variable "public_ip_list" {
+  description = "The names of the public IP resources."
+  type        = list(string)
+}
 
-#variable "vnet_peering_list" {
-#  description = "The names of the VNET peering resources."
-#  type        = list(string)
-#}
+variable "vnet_peering_list" {
+  description = "The names of the VNET peering resources."
+  type        = list(string)
+}
 
 variable "tags" {
   description = "Tags to apply to all resources."

@@ -68,10 +68,27 @@ resource "azurerm_subnet_route_table_association" "rt_to_hub_subnets" {
   for_each = {for k, v in flatten(var.vnets[[for vn in var.vnets : vn.vnet_name][0]].subnets) : k => v if v.rt_name != ""}
   subnet_id      = "${data.azurerm_subscription.current.id}/resourceGroups/${var.resourcegroup_name}/providers/Microsoft.Network/virtualNetworks/${[for vn in var.vnets : vn.vnet_name][0]}/subnets/${each.value.name}"
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
+  depends_on = [
+    azurerm_virtual_network.vnets,
+    azurerm_route_table.rts
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "rt_to_spoke_subnets" {
   for_each = {for k, v in flatten(var.vnets[[for vn in var.vnets : vn.vnet_name][1]].subnets) : k => v if v.rt_name != ""}
   subnet_id      = "${data.azurerm_subscription.current.id}/resourceGroups/${var.resourcegroup_name}/providers/Microsoft.Network/virtualNetworks/${[for vn in var.vnets : vn.vnet_name][1]}/subnets/${each.value.name}"
   route_table_id = azurerm_route_table.rts[each.value.rt_name].id
+  depends_on = [
+    azurerm_virtual_network.vnets,
+    azurerm_route_table.rts
+  ]
+}
+
+resource "azurerm_public_ip" "public_ips" {
+  for_each            = var.public_ip_list
+  name                = each.key
+  resource_group_name = var.resourcegroup_name
+  location            = var.location_network
+  allocation_method   = "Static"
+  tags                = var.tags
 }
