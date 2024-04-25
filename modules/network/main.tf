@@ -53,7 +53,7 @@ resource "azurerm_virtual_network" "vnets" {
     content {
       name           = subnet.value.name
       address_prefix = subnet.value.address_prefix
-      security_group = subnet.value.nsg_name != "" ? subnet.value.nsg_name : null
+      security_group = subnet.value.nsg_name != "" ? azurerm_network_security_group.nsgs[subnet.value.nsg_name].id : null
     }
   }
   tags = var.tags
