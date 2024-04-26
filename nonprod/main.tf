@@ -33,3 +33,15 @@ module "monitor" {
     azurerm_resource_group.resource_groups
   ]
 }
+
+module "paas" {
+  source             = "../modules/paas"
+  location           = var.resource_groups["rg3"].location
+  resourcegroup_name = var.resource_groups["rg3"].name
+  acr_name           = var.acr_name
+  law_id             = module.monitor.law_id
+  tags               = var.tags
+  depends_on = [
+    azurerm_resource_group.resource_groups
+  ]
+}

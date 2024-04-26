@@ -477,3 +477,9 @@ variable "appinsight_name" {
   type        = string
   default     = "ai-aks-nonprod-weu-01"
 }
+
+variable "acr_name" {
+  description = "Specifies the name of the Azure Container Registry component."
+  type        = string
+  default     = "acraksnonprodweu01"
+}
