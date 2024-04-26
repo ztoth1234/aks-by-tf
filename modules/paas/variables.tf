@@ -22,3 +22,13 @@ variable "law_id" {
   description = "The Log Analytics Workspace ID."
   type        = string
 }
+
+variable "acr_pe_vnet_id" {
+  description = "The VNET ID of the Private Endpoint of the ACR"
+  type = string
+}
+
+variable "acr_pe_subnet_id" {
+  description = "The subnet ID of the Private Endpoint of the ACR"
+  type = string
+}

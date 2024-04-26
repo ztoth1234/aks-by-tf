@@ -19,23 +19,44 @@ resource "azurerm_monitor_diagnostic_setting" "ds_acr" {
 
   enabled_log {
     category = "ContainerRegistryLoginEvents"
-    retention_policy {
-      enabled = false
-    }
   }
-
   enabled_log {
     category = "ContainerRegistryRepositoryEvents"
-    retention_policy {
-      enabled = false
-    }
   }
 
   metric {
     category = "AllMetrics"
+  }
+}
 
-    retention_policy {
-      enabled = false
-    }
+resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
+  name                = "privatelink.azurecr.io"
+  resource_group_name =  var.resourcegroup_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "acr_private_dns_zone_virtual_network_link" {
+  name                  = "${var.acr_name}-private-dns-zone-vnet-link"
+  private_dns_zone_name = azurerm_private_dns_zone.acr_private_dns_zone.name
+  resource_group_name   = var.resourcegroup_name
+  virtual_network_id    = var.acr_pe_vnet_id
+  tags                  = var.tags
+}
+
+resource "azurerm_private_endpoint" "acr_private_endpoint" {
+  name                = "${var.acr_name}-private-endpoint"
+  location            = var.location
+  resource_group_name = var.resourcegroup_name
+  subnet_id           = var.acr_pe_subnet_id
+
+  private_service_connection {
+    name                           = "${var.acr_name}-service-connection"
+    private_connection_resource_id = azurerm_container_registry.acr.id
+    subresource_names              = ["registry"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "${var.acr_name}-private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.acr_private_dns_zone.id]
   }
 }
