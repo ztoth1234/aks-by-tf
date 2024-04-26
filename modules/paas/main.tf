@@ -12,22 +12,25 @@ resource "azurerm_container_registry" "acr" {
   tags                          = var.tags
 }
 
-resource "azurerm_monitor_diagnostic_setting" "ds_acr" {
-  name                       = "ds-acr"
-  target_resource_id         = azurerm_container_registry.acr.id
-  log_analytics_workspace_id = var.law_id
+#resource "azurerm_monitor_diagnostic_setting" "ds_acr" {
+#  name                       = "ds-acr"
+#  target_resource_id         = azurerm_container_registry.acr.id
+#  log_analytics_workspace_id = var.law_id
 
-  enabled_log {
-    category = "ContainerRegistryLoginEvents"
-  }
-  enabled_log {
-    category = "ContainerRegistryRepositoryEvents"
-  }
+#  enabled_log {
+#    category = "ContainerRegistryLoginEvents"
+#  }
+#  enabled_log {
+#    category = "ContainerRegistryRepositoryEvents"
+#  }
 
-  metric {
-    category = "AllMetrics"
-  }
-}
+#  metric {
+#    category = "AllMetrics"
+#  }
+#  depends_on = [
+#    azurerm_container_registry.acr
+#  ]
+#}
 
 resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   name                = "privatelink.azurecr.io"
