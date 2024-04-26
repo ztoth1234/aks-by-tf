@@ -2,8 +2,8 @@ resource "azurerm_log_analytics_workspace" "law" {
   name                       = var.log_analytics_workspace_name
   location                   = var.location
   resource_group_name        = var.resourcegroup_name
-  sku                        = "Free"
-  retention_in_days          = 7
+  sku                        = "PerGB2018"
+  retention_in_days          = 30
   internet_ingestion_enabled = false
   internet_query_enabled     = false
   tags                       = var.tags
