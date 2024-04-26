@@ -21,3 +21,15 @@ module "network" {
     azurerm_resource_group.resource_groups
   ]
 }
+
+module "monitor" {
+  source                       = "../modules/monitor"
+  location                     = var.resource_groups["rg2"].location
+  resourcegroup_name           = var.resource_groups["rg2"].name
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+  appinsight_name              = var.appinsight_name
+  tags                         = var.tags
+  depends_on = [
+    azurerm_resource_group.resource_groups
+  ]
+}

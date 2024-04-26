@@ -466,3 +466,14 @@ variable "vnet_peerings" {
     "peer-spoke-hub-nonprod-weu-01"
   ]
 }
+
+variable "log_analytics_workspace_name" {
+  description = "Specifies the name of the Log Analytics Workspace."
+  type        = string
+  default     = "la-aks-nonprod-weu-01"
+}
+variable "appinsight_name" {
+  description = "Specifies the name of the Application Insights component."
+  type        = string
+  default     = "ai-aks-nonprod-weu-01"
+}
