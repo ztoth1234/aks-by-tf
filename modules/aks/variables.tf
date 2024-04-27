@@ -17,3 +17,8 @@ variable "tags" {
   description = "Tags to apply to all resources."
   type        = map(string)
 }
+
+variable "acr_id" {
+  description = "The ID of the Container Registry."
+  type = string
+}

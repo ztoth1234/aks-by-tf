@@ -1,27 +1,9 @@
-resource "azurerm_private_dns_zone" "aks_private_dns_zone" {
-  name                = "privatelink.westeurope.azmk8s.io"
-  resource_group_name = var.resourcegroup_name
-}
-
-resource "azurerm_user_assigned_identity" "aks_ui" {
-  name                = "aks-user-identity"
-  resource_group_name = var.resourcegroup_name
-  location            = var.location
-}
-
-resource "azurerm_role_assignment" "aks-ui-role-assign" {
-  scope                = azurerm_private_dns_zone.aks_private_dns_zone.id
-  role_definition_name = "Private DNS Zone Contributor"
-  principal_id         = azurerm_user_assigned_identity.aks_ui.principal_id
-}
-
 resource "azurerm_kubernetes_cluster" "aks" {
   name                    = var.aks_name
   location                = var.location
   resource_group_name     = var.resourcegroup_name
   dns_prefix              = "aks"
   private_cluster_enabled = true
-  private_dns_zone_id     = azurerm_private_dns_zone.aks_private_dns_zone.id
   default_node_pool {
     name       = "default"
     node_count = 1
@@ -29,12 +11,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   identity {
-    type = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.aks_ui.id]
+    type = "SystemAssigned"
   }
 
   tags = var.tags
-  depends_on = [
-    azurerm_role_assignment.aks-ui-role-assign
-  ]
+}
+
+resource "azurerm_role_assignment" "attach_aks_to_acr" {
+  principal_id                     = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+  role_definition_name             = "AcrPull"
+  scope                            = var.acr_id
+  skip_service_principal_aad_check = true
 }

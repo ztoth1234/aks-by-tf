@@ -66,6 +66,7 @@ module "aks" {
   location           = var.resource_groups["rg4"].location
   resourcegroup_name = var.resource_groups["rg4"].name
   aks_name           = var.aks_name
+  acr_id             = module.paas.acr_id
   tags               = var.tags
   depends_on = [
     azurerm_resource_group.resource_groups,

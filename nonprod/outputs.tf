@@ -35,14 +35,24 @@ output "kv_id" {
   value       = module.paas.kv_id
 }
 
+output "aks_id" {
+  description = "The Kubernetes Managed Cluster ID."
+  value       = module.aks.aks_id
+}
+
 output "aks_client_certificate" {
   description = "Base64 encoded public certificate used by clients to authenticate to the Kubernetes cluster."
-  value       = module.aks.client_certificate
+  value       = module.aks.aks_client_certificate
   sensitive   = true
 }
 
 output "aks_kube_config" {
   description = " Raw Kubernetes config to be used by kubectl and other compatible tools."
-  value       = module.aks.kube_config
+  value       = module.aks.aks_kube_config
   sensitive   = true
+}
+
+output "aks_private_fqdn" {
+  description = "The FQDN for the Kubernetes Cluster when private link has been enabled, which is only resolvable inside the Virtual Network used by the Kubernetes Cluster."
+  value       = module.aks.aks_private_fqdn
 }
