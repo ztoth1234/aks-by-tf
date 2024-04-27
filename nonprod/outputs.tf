@@ -24,3 +24,13 @@ output "app_id" {
   description = "The App ID associated with this Application Insights component."
   value       = module.monitor.app_id
 }
+
+output "acr_id" {
+  description = "The ID of the Container Registry."
+  value = module.paas.acr_id
+}
+
+output "kv_id" {
+  description = "The ID of the Key Vault."
+  value = module.paas.kv_id
+}

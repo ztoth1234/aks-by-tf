@@ -23,12 +23,17 @@ variable "law_id" {
   type        = string
 }
 
-variable "acr_pe_vnet_id" {
+variable "pe_vnet_id" {
   description = "The VNET ID of the Private Endpoint of the ACR"
   type = string
 }
 
-variable "acr_pe_subnet_id" {
+variable "pe_subnet_id" {
   description = "The subnet ID of the Private Endpoint of the ACR"
   type = string
+}
+
+variable "kv_name" {
+  description = "Specifies the name of the Azure Key Vault component."
+  type        = string
 }

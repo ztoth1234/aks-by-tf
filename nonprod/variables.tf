@@ -483,3 +483,9 @@ variable "acr_name" {
   type        = string
   default     = "acraksnonprodweu01"
 }
+
+variable "kv_name" {
+  description = "Specifies the name of the Azure Key Vault component."
+  type        = string
+  default     = "kv-aks-nonprod-weu-01"
+}
