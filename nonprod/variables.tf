@@ -489,3 +489,9 @@ variable "kv_name" {
   type        = string
   default     = "kv-aks-nonprod-weu-01"
 }
+
+variable "aks_name" {
+  description = "Specifies the name of the Azure Kubernetes Cluster."
+  type        = string
+  default     = "aks-aks-nonprod-weu-01"
+}
