@@ -22,3 +22,28 @@ variable "acr_id" {
   description = "The ID of the Container Registry."
   type = string
 }
+
+variable "law_id" {
+  description = "The Log Analytics Workspace ID."
+  type        = string
+}
+
+variable "system_node_subnet_id" {
+  description = "The subnet ID of the System Node subnet of the AKS"
+  type = string
+}
+
+variable "system_pod_subnet_id" {
+  description = "The subnet ID of the System Pod subnet of the AKS"
+  type = string
+}
+
+variable "user_node_subnet_id" {
+  description = "The subnet ID of the User Node subnet of the AKS"
+  type = string
+}
+
+variable "user_pod_subnet_id" {
+  description = "The subnet ID of the User Pod subnet of the AKS"
+  type = string
+}

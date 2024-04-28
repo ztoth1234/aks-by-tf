@@ -414,10 +414,28 @@ variable "vnets" {
           rt_name        = "rt-internet-default-nonprod-weu-01"
         },
         {
-          name           = "AksSubnet"
-          address_prefix = "10.1.0.0/23"
+          name           = "SystemNodeSubnet"
+          address_prefix = "10.1.0.0/27"
           nsg_name       = ""
-          rt_name        = "rt-aks-nonprod-weu-01"
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "SystemPodSubnet"
+          address_prefix = "10.1.1.0/24"
+          nsg_name       = ""
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "UserNodeSubnet"
+          address_prefix = "10.1.0.32/27"
+          nsg_name       = ""
+          rt_name        = "rt-internet-default-nonprod-weu-01"
+        },
+        {
+          name           = "UserPodSubnet"
+          address_prefix = "10.1.2.0/24"
+          nsg_name       = ""
+          rt_name        = "rt-internet-default-nonprod-weu-01"
         },
         {
           name           = "JumpboxSubnet"

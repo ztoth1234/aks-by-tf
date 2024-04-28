@@ -19,3 +19,8 @@ output "aks_private_fqdn" {
   description = "The FQDN for the Kubernetes Cluster when private link has been enabled, which is only resolvable inside the Virtual Network used by the Kubernetes Cluster."
   value = azurerm_kubernetes_cluster.aks.private_fqdn
 }
+
+output "aks_current_version" {
+  description = "The current version running on the Azure Kubernetes Managed Cluster."
+  value = azurerm_kubernetes_cluster.aks.kubernetes_version
+}

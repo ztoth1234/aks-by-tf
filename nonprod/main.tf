@@ -62,12 +62,17 @@ module "paas" {
 # Create private Azure Kubernetes Cluster                     #
 ###############################################################
 module "aks" {
-  source             = "../modules/aks"
-  location           = var.resource_groups["rg4"].location
-  resourcegroup_name = var.resource_groups["rg4"].name
-  aks_name           = var.aks_name
-  acr_id             = module.paas.acr_id
-  tags               = var.tags
+  source                = "../modules/aks"
+  location              = var.resource_groups["rg4"].location
+  resourcegroup_name    = var.resource_groups["rg4"].name
+  aks_name              = var.aks_name
+  acr_id                = module.paas.acr_id
+  law_id                = module.monitor.law_id
+  system_node_subnet_id = [for v in flatten([for v in module.network.subnet_ids : v]) : v if strcontains(v, "SystemNodeSubnet")][0]
+  system_pod_subnet_id  = [for v in flatten([for v in module.network.subnet_ids : v]) : v if strcontains(v, "SystemPodSubnet")][0]
+  user_node_subnet_id   = [for v in flatten([for v in module.network.subnet_ids : v]) : v if strcontains(v, "UserNodeSubnet")][0]
+  user_pod_subnet_id    = [for v in flatten([for v in module.network.subnet_ids : v]) : v if strcontains(v, "UserPodSubnet")][0]
+  tags                  = var.tags
   depends_on = [
     azurerm_resource_group.resource_groups,
     module.network,
